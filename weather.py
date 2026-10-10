@@ -41,9 +41,11 @@ class WeatherModule(tk.Frame):
     current_weather_code = current.Variables(2).Value()
     self.current_weather_label.config(text=weatherCode.get_description(current_weather_code))
 
+    self.after(300000, self.update_weather)
+
   def get_weather_data(self):
     # Setup the Open-Meteo API client with cache and retry on error
-    cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
+    cache_session = requests_cache.CachedSession('.cache', expire_after=150)
     retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
     openmeteo = openmeteo_requests.Client(session=retry_session)
     # Make sure all required weather variables are listed here
