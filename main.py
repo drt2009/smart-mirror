@@ -1,10 +1,7 @@
 import tkinter as tk
 
 from clock import ClockModule
-
-#For Weather
-
-
+from weather import WeatherModule
 
 def main():
   root =tk.Tk()
@@ -13,10 +10,17 @@ def main():
   root.configure(bg="black")
   root.attributes("-fullscreen", True)
 
+  root.grid_columnconfigure(0, weight=0)
+  root.grid_columnconfigure(1, weight=1)
+  root.grid_columnconfigure(2, weight=0)
+
   root.bind("<Escape>", lambda e: root.destroy())
 
   clock = ClockModule(root)
-  clock.pack()
+  clock.grid(row=0, column=1)
+
+  weather = WeatherModule(root)
+  weather.grid(row=0, column=0)
 
   root.mainloop()
 

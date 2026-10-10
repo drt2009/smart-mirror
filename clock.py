@@ -2,8 +2,8 @@ import time
 import tkinter as tk
 
 class ClockModule(tk.Frame):
-  def __init__(self, parent, **kwargs):
-    super().__init__(parent, **kwargs)
+  def __init__(self, parent):
+    super().__init__(parent)
     self.configure(bg="black")
 
     # Time Label
