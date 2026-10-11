@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from clock import ClockModule
-from weather import WeatherModule
+from weatherOld import WeatherModule
 
 def main():
   root =tk.Tk()
