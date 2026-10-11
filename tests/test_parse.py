@@ -319,7 +319,7 @@ def test_daily_values_are_in_order(snapshot):
     daily = snapshot.daily
     assert [d.high for d in daily] == approx([72.0, 65.0, 58.0])
     assert [d.low for d in daily] == approx([55.0, 50.0, 44.0])
-    assert [d.precipitation_sum for d in daily] == approx([0.0, 0.4, 0.0])
+    assert [d.precipitation_probability for d in daily] == approx([0.0, 10, 0.0])
     assert [d.weather_code for d in daily] == [3, 61, 71]
 
 
@@ -344,7 +344,7 @@ def test_daily_uses_plain_python_types(snapshot):
     entry = snapshot.daily[0]
     assert type(entry.high) is float
     assert type(entry.low) is float
-    assert type(entry.precipitation_sum) is float
+    assert type(entry.precipitation_probability) is float
     assert type(entry.weather_code) is int
 
 
