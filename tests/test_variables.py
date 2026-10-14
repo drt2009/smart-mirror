@@ -54,7 +54,7 @@ REQUIRED = [
             "weather_code",
             "temperature_2m_max",
             "temperature_2m_min",
-            "precipitation_sum",
+            "precipitation_probability_mean",
         },
         id="daily",
     ),
