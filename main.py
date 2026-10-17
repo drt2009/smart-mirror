@@ -12,19 +12,18 @@ def main():
   root.configure(cursor="none")
   root.attributes("-fullscreen", True)
 
-  root.grid_columnconfigure(0, weight=0)
-  root.grid_columnconfigure(1, weight=1)
-  root.grid_columnconfigure(2, weight=0)
-
+  for column in range(3):
+    root.grid_columnconfigure(column, weight=1, uniform="thirds")
+  root.grid_rowconfigure(0, weight=0)
   root.bind("<Escape>", lambda e: root.destroy())
 
   clock = ClockModule(root)
-  clock.grid(row=0, column=1)
+  clock.grid(row=0, column=1, sticky="n")
 
   (lat,lon) = config.load_location()
   location_name = config.load_location_name()
   weather = WeatherModule(root,lat,lon,location_name)
-  weather.grid(row=0, column=0)
+  weather.grid(row=0, column=0, sticky="nw")
 
 
   root.mainloop()
