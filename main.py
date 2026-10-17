@@ -9,6 +9,7 @@ def main():
   root.title("Smart Mirror")
   root.geometry("1920x1080")
   root.configure(bg="black")
+  root.configure(cursor="none")
   root.attributes("-fullscreen", True)
 
   root.grid_columnconfigure(0, weight=0)
