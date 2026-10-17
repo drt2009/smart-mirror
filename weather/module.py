@@ -9,9 +9,16 @@ import weather.views as views
 
 
 class WeatherModule(tk.Frame):
+
+    _STALE_AFTER_SECONDS = 600
+    _ROTATE_MS = 10_000
+    _REFRESH_MS = 10 * 60 * 1000
+    _RETRY_MS = 60 * 1000
+    _POLL_MS = 500
+
     def __init__(self, parent, lat, lon, loc_name):
         super().__init__(parent, bg="black")
-        self._weather_label = tk.Label(self, text="Loading.",
+        self._weather_label = tk.Label(self, text="Loading....",
                         bg="black", fg="white",
                         font=("Arial", 28), anchor="nw"
                         )
@@ -19,14 +26,13 @@ class WeatherModule(tk.Frame):
         self._weather_state = WeatherState(600)
         self._lat = lat
         self._lon = lon
-        self._fetch_snapshot(self._lat, self._lon)
         self._location_name = loc_name
         self._results = queue.Queue()
 
         self._render()
         self._start_fetch()
-        self.after(500, self._poll)
-        self.after(3000, self._rotation)
+        self.after(self._POLL_MS, self._poll)
+        self.after(self._ROTATE_MS, self._rotation)
 
 
     def _start_fetch(self):
@@ -47,27 +53,24 @@ class WeatherModule(tk.Frame):
         else:
             if isinstance(result, WeatherFetchError):
                 self._weather_state.mark_failed()
-                next_fetch_ms = 60 * 1000
+                next_fetch_ms = self._RETRY_MS
             else:
                 self._weather_state.update(result)
-                next_fetch_ms = 10 * 60 * 1000
+                next_fetch_ms = self._REFRESH_MS
             self._render()
             self.after(next_fetch_ms, self._start_fetch)
-        self.after(500, self._poll)
+        self.after(self._POLL_MS, self._poll)
 
     def _rotation(self):
         self._weather_state.advance()
         self._render()
-        self.after(3000, self._rotation)
+        self.after(self._ROTATE_MS, self._rotation)
 
     def _render(self):
         if self._weather_state.is_loading:
-            self._weather_label = self._is_loading_text()
+            self._weather_label.config(text="Loading...")
         else:
             self._current_view_text()
-
-    def _is_loading_text(self):
-        return  self._weather_label.config(text="Loading...")
 
     def _current_view_text(self):
         match self._weather_state.view:
@@ -82,6 +85,3 @@ class WeatherModule(tk.Frame):
                     text=self._location_name + "\n" + "\n".join(views.daily_view(self._weather_state.snapshot,date.today())))
             case _:
                 raise NotImplementedError
-
-    def _fetch_snapshot(self, lat, lon):
-        self._weather_state.update(fetch_weather(lat, lon))
