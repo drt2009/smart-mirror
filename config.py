@@ -7,6 +7,10 @@ def load_location() -> tuple[float, float]:
     lon = _read_float("LONGITUDE", -180, 180)
     return lat, lon
 
+def load_location_name() -> str|None:
+    load_dotenv()
+    return os.getenv("LOCATION_NAME")
+
 def _read_float(name, low, high):
     raw = os.environ.get(name)
     if not raw:

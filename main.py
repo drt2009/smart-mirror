@@ -1,7 +1,8 @@
 import tkinter as tk
 
 from clock import ClockModule
-from weatherOld import WeatherModule
+from weather.module import WeatherModule
+import config
 
 def main():
   root =tk.Tk()
@@ -19,8 +20,11 @@ def main():
   clock = ClockModule(root)
   clock.grid(row=0, column=1)
 
-  weather = WeatherModule(root)
+  (lat,lon) = config.load_location()
+  location_name = config.load_location_name()
+  weather = WeatherModule(root,lat,lon,location_name)
   weather.grid(row=0, column=0)
+
 
   root.mainloop()
 
