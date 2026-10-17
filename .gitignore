@@ -1,3 +1,5 @@
 .idea/
 __pycache__/
 .cache.sqlite
+.env
+$PROFILE.txt
