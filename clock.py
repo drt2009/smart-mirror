@@ -8,13 +8,13 @@ class ClockModule(tk.Frame):
 
     # Time Label
     self.time_label = tk.Label(self, text="",
-                               font=("Arial", 42, "bold"),
+                               font=("Arial", 56, "bold"),
                                fg="white", bg="black")
     self.time_label.pack()
 
     # Date Label
     self.date_label = tk.Label(self, text="",
-                               font=("Arial", 24), fg="white",
+                               font=("Arial", 20), fg="white",
                                bg="black")
     self.date_label.pack(pady=(5, 0))
 
