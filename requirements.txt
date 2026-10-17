@@ -1,2 +1,3 @@
 openmeteo-requests
 dotenv
+numpy
