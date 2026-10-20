@@ -22,3 +22,15 @@ def _read_float(name, low, high):
     if not low <= value <= high:
         raise ValueError(f"{name} must be between {low} and {high}, got {value}")
     return value
+
+def load_calendar_url() -> str|None:
+    load_dotenv()
+    calendar_url = os.getenv("SECRET_ICAL_URL")
+    if calendar_url:
+        calendar_url = calendar_url.strip()
+        if calendar_url:
+            return calendar_url
+        else:
+            raise ValueError("SECRET_ICAL_URL is not set")
+    else:
+        raise ValueError("SECRET_ICAL_URL is not set")

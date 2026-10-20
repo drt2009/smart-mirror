@@ -1,3 +1,4 @@
 openmeteo-requests
 dotenv
 numpy
+ical

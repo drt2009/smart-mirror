@@ -2,6 +2,7 @@ import tkinter as tk
 
 from clock import ClockModule
 from weather.module import WeatherModule
+from agenda.module import AgendaModule
 import config
 
 def main():
@@ -24,6 +25,10 @@ def main():
   location_name = config.load_location_name()
   weather = WeatherModule(root,lat,lon,location_name)
   weather.grid(row=0, column=0, sticky="nw")
+
+  ical_address = config.load_calendar_url()
+  agenda = AgendaModule(root,ical_address)
+  agenda.grid(row=0, column=2, sticky="ne")
 
 
   root.mainloop()
