@@ -1,20 +1,18 @@
 import time
 
-from agenda.prase import parse
-
-
 class AgendaState:
     def __init__(self, stale_after : int ,  clock =time.monotonic):
         self._clock = clock
         if stale_after <= 0:
-            raise ValueError
+            raise ValueError("stale_after must be positive")
         self._stale_after = stale_after
         self._updated_at = None
         self._internal_ics_calendar = None
         self._last_failed = False
+        self._events = []
 
-    def update_calendar(self, ics_calendar):
-       self._internal_ics_calendar = ics_calendar
+    def update(self, events:list):
+       self._events = events.copy()
        self._updated_at = self._clock()
        self._last_failed = False
 
@@ -27,18 +25,14 @@ class AgendaState:
 
     @property
     def is_loading(self):
-        return self.ics_calendar is None
-
-    @property
-    def ics_calendar(self):
-        return self._internal_ics_calendar
-
-    @property
-    def ics_calendar_events(self):
-        return parse(self.ics_calendar,5)
+        return self.events == [] and self._updated_at is None
 
     @property
     def is_stale(self):
         if self._updated_at is None:
             return False
         return self._clock() - self._updated_at > self._stale_after
+
+    @property
+    def events(self):
+        return self._events.copy()

@@ -2,3 +2,4 @@ openmeteo-requests
 dotenv
 numpy
 ical
+ical[async]

@@ -1,13 +1,15 @@
 import asyncio
 import tkinter as tk
-from datetime import date
+from datetime import date, datetime
 import queue
 import threading
+from zoneinfo import ZoneInfo
 
-from agenda.clent import CalendarFetchError
+from agenda.client import CalendarFetchError
 from agenda.state import AgendaState
-from agenda.clent import fetch_calendar_text
-from agenda.view import agenda_view
+from agenda.client import fetch_calendar
+from agenda.views import agenda_lines
+from agenda.parse import upcoming
 
 
 class AgendaModule(tk.Frame):
@@ -38,7 +40,7 @@ class AgendaModule(tk.Frame):
 
     def _fetch_worker(self):
         try:
-           result = asyncio.run(fetch_calendar_text(self._ical_address))
+           result = asyncio.run(fetch_calendar(self._ical_address))
            self._results.put(result)
         except CalendarFetchError as error:
             self._results.put(error)
@@ -53,7 +55,7 @@ class AgendaModule(tk.Frame):
                 self._agende_state.mark_failed()
                 next_fetch_ms = self._RETRY_MS
             else:
-                self._agende_state.update_calendar(result)
+                self._agende_state.update(upcoming(result, datetime.today().astimezone(ZoneInfo("America/New_York"))))
                 next_fetch_ms = self._REFRESH_MS
             self._render()
             self.after(next_fetch_ms, self._start_fetch)
@@ -68,5 +70,5 @@ class AgendaModule(tk.Frame):
 
     def _agenda_text(self):
         self._agenda_label.config(
-            text="\n".join(agenda_view(self._agende_state.ics_calendar_events))
+            text="\n".join(agenda_lines(self._agende_state.events,datetime.today().astimezone(ZoneInfo("America/New_York")))),
         )
