@@ -66,7 +66,7 @@ class AgendaModule(tk.Frame):
             self._agenda_label.config(text="Loading...")
         else:
             self._agenda_text()
-        self.after(200, self._render)
+        self.after(self._REFRESH_MS, self._render)
 
     def _agenda_text(self):
         self._agenda_label.config(
