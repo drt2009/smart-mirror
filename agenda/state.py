@@ -7,7 +7,6 @@ class AgendaState:
             raise ValueError("stale_after must be positive")
         self._stale_after = stale_after
         self._updated_at = None
-        self._internal_ics_calendar = None
         self._last_failed = False
         self._events = []
 

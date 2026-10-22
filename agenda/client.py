@@ -9,7 +9,7 @@ class CalendarFetchError(Exception):
 
 async def fetch_calendar(url:str, timeout=DEFAULT_TIMEOUT_SECONDS):
     if timeout<=0:
-        raise CalendarFetchError("Timeout error")
+        raise ValueError("Timeout cannot be negative")
     try:
         return await asyncio.wait_for(IcsCalendarStream.calendar_from_url(url),timeout)
     except Exception:

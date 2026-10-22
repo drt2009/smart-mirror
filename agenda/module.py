@@ -1,6 +1,6 @@
 import asyncio
 import tkinter as tk
-from datetime import date, datetime
+from datetime import datetime
 import queue
 import threading
 from zoneinfo import ZoneInfo
@@ -13,21 +13,21 @@ from agenda.parse import upcoming
 
 
 class AgendaModule(tk.Frame):
-
-    _STALE_AFTER_SECONDS = 600
+    _TZ = ZoneInfo("America/New_York")
+    _STALE_AFTER_SECONDS = 900
     _REFRESH_MS = 10 * 60 * 1000
     _RETRY_MS = 60 * 1000
     _POLL_MS = 500
 
     def __init__(self, parent, ical_address):
         super().__init__(parent, bg ="black")
-        self._agenda_label = tk.Label(self, text="Loading....",
+        self._agenda_label = tk.Label(self, text="Loading...",
                         bg="black", fg="white",
                         font=("Arial", 28), anchor="ne"
                         )
         self._agenda_label.pack(anchor="ne")
 
-        self._agende_state = AgendaState(600)
+        self._agende_state = AgendaState(self._STALE_AFTER_SECONDS)
         self._ical_address = ical_address
 
         self._results = queue.Queue()
@@ -40,7 +40,8 @@ class AgendaModule(tk.Frame):
 
     def _fetch_worker(self):
         try:
-           result = asyncio.run(fetch_calendar(self._ical_address))
+           calendar = asyncio.run(fetch_calendar(self._ical_address))
+           result = upcoming(calendar, datetime.today().astimezone(self._TZ))
            self._results.put(result)
         except CalendarFetchError as error:
             self._results.put(error)
@@ -55,7 +56,7 @@ class AgendaModule(tk.Frame):
                 self._agende_state.mark_failed()
                 next_fetch_ms = self._RETRY_MS
             else:
-                self._agende_state.update(upcoming(result, datetime.today().astimezone(ZoneInfo("America/New_York"))))
+                self._agende_state.update(result)
                 next_fetch_ms = self._REFRESH_MS
             self._render()
             self.after(next_fetch_ms, self._start_fetch)
@@ -66,9 +67,8 @@ class AgendaModule(tk.Frame):
             self._agenda_label.config(text="Loading...")
         else:
             self._agenda_text()
-        self.after(self._REFRESH_MS, self._render)
 
     def _agenda_text(self):
         self._agenda_label.config(
-            text="\n".join(agenda_lines(self._agende_state.events,datetime.today().astimezone(ZoneInfo("America/New_York")))),
+            text="\n".join(agenda_lines(self._agende_state.events,datetime.today().astimezone(self._TZ))),
         )
