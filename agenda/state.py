@@ -24,7 +24,7 @@ class AgendaState:
 
     @property
     def is_loading(self):
-        return self.events == [] and self._updated_at is None
+        return self._updated_at is None
 
     @property
     def is_stale(self):

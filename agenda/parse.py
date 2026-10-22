@@ -20,7 +20,7 @@ def upcoming(cal, now:datetime, tz: tzinfo = ZoneInfo("America/New_York"), limit
         if len(agenda_events) == limit:
             break
 
-    agenda_events.sort(key=lambda x: x.start)
+    agenda_events.sort(key=lambda event: (event.start, not event.all_day, event.title))
     return agenda_events
 
 def _parse_ical_event(event,tz:tzinfo):
