@@ -1,6 +1,8 @@
 import tkinter as tk
+from zoneinfo import ZoneInfo
 
 from clock import ClockModule
+from f1.module import F1Module
 from weather.module import WeatherModule
 from agenda.module import AgendaModule
 import config
@@ -16,6 +18,7 @@ def main():
   for column in range(3):
     root.grid_columnconfigure(column, weight=1, uniform="thirds")
   root.grid_rowconfigure(0, weight=0)
+  root.grid_rowconfigure(1, weight=1)
   root.bind("<Escape>", lambda e: root.destroy())
 
   clock = ClockModule(root)
@@ -30,6 +33,8 @@ def main():
   agenda = AgendaModule(root,ical_address)
   agenda.grid(row=0, column=2, sticky="ne")
 
+  f1 = F1Module(root, ZoneInfo("America/New_York"))
+  f1.grid(row=1, column=0, sticky="sw")
 
   root.mainloop()
 

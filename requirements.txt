@@ -3,3 +3,4 @@ dotenv
 numpy
 ical
 ical[async]
+requests
