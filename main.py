@@ -1,4 +1,5 @@
 import tkinter as tk
+from zoneinfo import ZoneInfo
 
 from clock import ClockModule
 from f1.module import F1Module
@@ -32,7 +33,7 @@ def main():
   agenda = AgendaModule(root,ical_address)
   agenda.grid(row=0, column=2, sticky="ne")
 
-  f1 = F1Module(root)
+  f1 = F1Module(root, ZoneInfo("America/New_York"))
   f1.grid(row=1, column=0, sticky="sw")
 
   root.mainloop()

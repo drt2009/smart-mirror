@@ -8,3 +8,4 @@ class UpcomingRace:
     country:str
     race_date: datetime
     sprint_race:bool
+    race_name: str
