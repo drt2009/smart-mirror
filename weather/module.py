@@ -11,7 +11,7 @@ import weather.views as views
 class WeatherModule(tk.Frame):
 
     _STALE_AFTER_SECONDS = 600
-    _ROTATE_MS = 2_000
+    _ROTATE_MS = 20_000
     _REFRESH_MS = 10 * 60 * 1000
     _RETRY_MS = 60 * 1000
     _POLL_MS = 500
