@@ -10,7 +10,7 @@ def current_view(snapshot : models.WeatherSnapshot) -> list[str]:
         f"Feels like {format_temperature(current.feels_like)}",
     ]
 
-def hourly_view(snapshot : models.WeatherSnapshot) -> list[str]:
+def hourly_rows(snapshot : models.WeatherSnapshot):
     lines = []
     for hour in snapshot.hourly:
         line_parts = [
@@ -19,22 +19,21 @@ def hourly_view(snapshot : models.WeatherSnapshot) -> list[str]:
             hour.condition,
             format_chance(hour.precipitation_probability)
         ]
-        lines.append(" ".join(part for part in line_parts if part))
+        lines.append(line_parts)
     return lines
 
-def daily_view(snapshot : models.WeatherSnapshot, today: date) -> list[str]:
+def daily_rows(snapshot : models.WeatherSnapshot, today: date):
     lines = []
     for day in snapshot.daily:
         line_parts = [
-            format_day(day.date,today),
+            format_day(day.date, today),
             format_temperature(day.high),
             format_temperature(day.low),
             day.condition,
             format_chance(day.precipitation_probability)
         ]
-        lines.append(" ".join(part for part in line_parts if part))
+        lines.append(line_parts)
     return lines
-
 
 #helpers
 def format_chance(percent: float) -> str:

@@ -23,7 +23,7 @@ class F1Module(tk.Frame):
         self._fetching = False
         self._f1_label = tk.Label(self, bg="black", fg="white",
                                   font=("Arial", 28), anchor="sw", justify="left")
-        self._f1_label.pack(anchor="sw")
+        self._f1_label.pack(anchor="sw", padx=15, pady=15)
         self._render()
         self._refresh()
         self.after(POLL_MS, self._poll)

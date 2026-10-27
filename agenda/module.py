@@ -5,10 +5,9 @@ import queue
 import threading
 from zoneinfo import ZoneInfo
 
-from agenda.client import CalendarFetchError
+from agenda.client import CalendarFetchError, fetch_calendar
 from agenda.state import AgendaState
-from agenda.client import fetch_calendar
-from agenda.views import agenda_lines
+from agenda.views import agenda_rows
 from agenda.parse import upcoming
 
 
@@ -18,14 +17,16 @@ class AgendaModule(tk.Frame):
     _REFRESH_MS = 10 * 60 * 1000
     _RETRY_MS = 60 * 1000
     _POLL_MS = 500
+    _FONT = ("Arial", 28)
 
     def __init__(self, parent, ical_address):
         super().__init__(parent, bg ="black")
-        self._agenda_label = tk.Label(self, text="Loading...",
+        self._message_label = tk.Label(self, text="Loading...",
                         bg="black", fg="white",
-                        font=("Arial", 28), anchor="ne"
+                        font=self._FONT, anchor="ne"
                         )
-        self._agenda_label.pack(anchor="ne")
+        self._message_label.pack(anchor="nw")
+        self._rows_frame = tk.Frame(self, bg="black")
 
         self._agende_state = AgendaState(self._STALE_AFTER_SECONDS)
         self._ical_address = ical_address
@@ -64,11 +65,31 @@ class AgendaModule(tk.Frame):
 
     def _render(self):
         if self._agende_state.is_loading:
-            self._agenda_label.config(text="Loading...")
+            self._message_label.config(text="Loading...")
         else:
-            self._agenda_text()
+            now = datetime.now(self._TZ)
+            rows = agenda_rows(self._agende_state.events, now, self._TZ)
+            self._show_rows(rows)
 
-    def _agenda_text(self):
-        self._agenda_label.config(
-            text="\n".join(agenda_lines(self._agende_state.events,datetime.today().astimezone(self._TZ))),
-        )
+    def _update_to_loading(self, message:str):
+        self._clear_rows()
+        self._rows_frame.pack_forget()
+        self._message_label.config(text=message)
+        self._message_label.pack(anchor="ne")
+
+    def _clear_rows(self):
+        for child in self._rows_frame.winfo_children():
+            child.destroy()
+
+    def _show_rows(self, rows):
+        self._message_label.pack_forget()
+        self._clear_rows()
+        self._rows_frame.pack(anchor="ne", padx=(0,15))
+        for row_number, row in enumerate(rows):
+            for column_number, text in enumerate(row):
+                wrap = 450 if column_number == 2 else 0
+                tk.Label(self._rows_frame, text=text, bg="black", fg="white",
+                         font=self._FONT, anchor="w", justify="left",
+                         wraplength=wrap,
+                         ).grid(row=row_number, column=column_number,
+                                sticky="nw", padx=(0, 16))

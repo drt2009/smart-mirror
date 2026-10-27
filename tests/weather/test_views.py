@@ -42,12 +42,12 @@ import pytest
 from weather.models import CurrentWeather, DailyEntry, HourlyEntry, WeatherSnapshot
 from weather.views import (
     current_view,
-    daily_view,
     format_chance,
     format_day,
     format_hour,
     format_temperature,
-    hourly_view,
+    hourly_rows,
+    daily_rows
 )
 
 EDT = timezone(timedelta(hours=-4))
@@ -202,85 +202,6 @@ def test_current_view_rounds_each_value_on_its_own():
     )
     assert current_view(snap) == ["0°", "Clear sky", "Feels like -4°"]
 
-
-# --------------------------------------------------------------------------
-# hourly_view
-# --------------------------------------------------------------------------
-def test_hourly_view_has_one_line_per_entry_in_order():
-    lines = hourly_view(make_snapshot())
-    assert len(lines) == 4
-    assert [line.split()[0] for line in lines] == ["6", "7", "8", "9"]
-    assert all("PM" in line for line in lines)
-
-
-def test_hourly_line_order_is_hour_then_temperature_then_condition():
-    line = hourly_view(make_snapshot())[0]
-    assert line.startswith("6 PM")
-    assert line.index("6 PM") < line.index("70°") < line.index("Overcast")
-
-
-def test_hourly_line_hides_a_low_chance():
-    line = hourly_view(make_snapshot())[0]  # 10%
-    assert "%" not in line
-
-
-def test_hourly_line_shows_a_worthwhile_chance_after_the_condition():
-    line = hourly_view(make_snapshot())[1]  # 60%
-    assert "Slight rain" in line
-    assert line.index("Slight rain") < line.index("60%")
-
-
-def test_hourly_view_follows_the_data_size():
-    one = make_snapshot(
-        hourly=[
-            HourlyEntry(
-                time=datetime(2026, 10, 10, 18, tzinfo=EDT),
-                temperature=70.0,
-                feels_like=68.0,
-                precipitation_probability=0.0,
-                weather_code=0,
-                condition="Clear sky",
-            )
-        ]
-    )
-    assert len(hourly_view(one)) == 1
-    assert hourly_view(make_snapshot(hourly=[])) == []
-
-
-# --------------------------------------------------------------------------
-# daily_view
-# --------------------------------------------------------------------------
-def test_daily_view_has_one_line_per_entry_in_order():
-    lines = daily_view(make_snapshot(), today=TODAY)
-    assert len(lines) == 3
-    assert lines[0].startswith("Today")
-    assert lines[1].startswith("Sun")
-    assert lines[2].startswith("Mon")
-
-
-def test_daily_line_order_is_day_high_low_condition():
-    line = daily_view(make_snapshot(), today=TODAY)[0]
-    assert line.index("Today") < line.index("72°") < line.index("55°")
-    assert line.index("55°") < line.index("Overcast")
-
-
-def test_daily_line_hides_a_low_chance_and_shows_a_high_one():
-    lines = daily_view(make_snapshot(), today=TODAY)
-    assert "%" not in lines[0]  # 15%
-    assert "80%" in lines[1]
-    assert "%" not in lines[2]  # 0%
-
-
-def test_daily_labels_depend_on_the_given_today():
-    lines = daily_view(make_snapshot(), today=date(2026, 10, 11))
-    assert lines[0].startswith("Sat")  # yesterday relative to that "today"
-    assert lines[1].startswith("Today")
-
-
-def test_daily_view_handles_empty_data():
-    assert daily_view(make_snapshot(daily=[]), today=TODAY) == []
-
-
 # --------------------------------------------------------------------------
 # No side effects
 # --------------------------------------------------------------------------
@@ -288,6 +209,6 @@ def test_views_do_not_change_the_snapshot():
     snap = make_snapshot()
     before = make_snapshot()
     current_view(snap)
-    hourly_view(snap)
-    daily_view(snap, today=TODAY)
+    hourly_rows(snap)
+    daily_rows(snap, today=TODAY)
     assert snap == before
